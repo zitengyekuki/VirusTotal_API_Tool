@@ -7,20 +7,28 @@
 
 import json, urllib, urllib2, argparse, hashlib, re, sys
 from pprint import pprint
+import csv
 
 class vtAPI():
     def __init__(self):
-        self.api = '<--------------PUBLIC-API-KEY-GOES-HERE----->'
+        # self.api = 'b2dd4cc915f0a7523346be7798e3bed5495316b6d5922a5787ea03f38bc47240'
+        self.api = '122d1bb596e6a20603572b919e3b7748b4d0e2554aeb5920840a99bb6b7412d4'
         self.base = 'https://www.virustotal.com/vtapi/v2/'
     
     def getReport(self,md5):
         param = {'resource':md5,'apikey':self.api}
         url = self.base + "file/report"
         data = urllib.urlencode(param)
-        result = urllib2.urlopen(url,data)
-        jdata =  json.loads(result.read())
-        return jdata
-    
+        try:
+            result = urllib2.urlopen(url, data, timeout=10)
+            jdata = json.loads(result.read())
+            return jdata
+        except:
+            with open("timeout_md5.csv", "a+") as timeout_csvfile:
+                writer = csv.writer(timeout_csvfile)
+                writer.writerow(md5)
+                return []
+
     def rescan(self,md5):
         param = {'resource':md5,'apikey':self.api}
         url = self.base + "file/rescan"

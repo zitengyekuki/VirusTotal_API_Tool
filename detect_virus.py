@@ -6,11 +6,11 @@ import time
 
 def read_csv():
     count = 0
-    # with open("test.csv", "r") as source_csvfile, open("result.csv", "a+") as result_csvfile:
-    with open("part2.csv", "r") as source_csvfile, open("result.csv", "a+") as result_csvfile:
+    with open("part1.csv", "r") as source_csvfile, open("result.csv", "a+") as result_csvfile:
         reader = csv.reader(source_csvfile)
         writer = csv.writer(result_csvfile)
-        writer.writerow(["index", "md5", "Qihoo-360", "Rising", "Baidu", "Tencent", "Kaspersky", "ESET-NOD32"])
+        writer.writerow(["index", "md5", "Qihoo-360", "Rising", "Baidu", "Tencent", "Kaspersky", "ESET-NOD32",
+                         "TrendMicro", "Symantec", "Kingsoft"])
         for line in reader:
             if line[1] != 'Count' and line[0] != '':
                 md5 = line[0]
@@ -28,9 +28,13 @@ def searchMD5(md5):
     print md5
     vt = vtAPI()
     is_virus = False
-    detection = ['', '', '', '', '', '', '', '']  # [index, md5, Qihoo-360, Rising, Baidu, Tencent, Kaspersky, ESET-NOD32]
+    detection = ['', '', '', '', '', '', '', '', '', '', '']
+    # [index, md5, Qihoo-360, Rising, Baidu, Tencent, Kaspersky, ESET-NOD32, TrendMicro, Symantec, Kingsoft]
     try:
         result = vt.getReport(md5)
+        if not result:
+            print md5 + " -- timeout"
+            return is_virus, detection
         if result['response_code'] == 0:
             print md5 + " -- Not Found in VT"
             return is_virus, detection
@@ -52,6 +56,15 @@ def searchMD5(md5):
                 is_virus = True
             if 'ESET-NOD32' in result['scans'] and result['scans']['ESET-NOD32']['result']:
                 detection[7] = result['scans']['ESET-NOD32']['result']
+                is_virus = True
+            if 'TrendMicro' in result['scans'] and result['scans']['TrendMicro']['result']:
+                detection[8] = result['scans']['TrendMicro']['result']
+                is_virus = True
+            if 'Symantec' in result['scans'] and result['scans']['Symantec']['result']:
+                detection[9] = result['scans']['Symantec']['result']
+                is_virus = True
+            if 'Kingsoft' in result['scans'] and result['scans']['Kingsoft']['result']:
+                detection[10] = result['scans']['Kingsoft']['result']
                 is_virus = True
 
             return is_virus, detection
