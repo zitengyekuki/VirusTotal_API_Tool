@@ -4,9 +4,9 @@ from vtlite import *
 import time
 
 
-def read_csv():
+def read_csv(path):
     count = 0
-    with open("part1.csv", "r") as source_csvfile, open("result.csv", "a+") as result_csvfile:
+    with open(path, "r") as source_csvfile, open("result.csv", "a+") as result_csvfile:
         reader = csv.reader(source_csvfile)
         writer = csv.writer(result_csvfile)
         writer.writerow(["index", "md5", "Qihoo-360", "Rising", "Baidu", "Tencent", "Kaspersky", "ESET-NOD32",
@@ -76,4 +76,8 @@ def searchMD5(md5):
 
 
 if __name__ == '__main__':
-    read_csv()
+    try:
+        path = sys.argv[1]
+        read_csv(path)
+    except:
+        print '[Error] invalid file path, for example: python detect_virus.py test.csv'
